@@ -11,29 +11,42 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by User on 2017.10.08.
  */
 
- class CustomAdapter extends ArrayAdapter<String> {
+ class CustomAdapter extends ArrayAdapter<ItemClass> {
+    private Context mContext;
+    private int mResource;
 
-     CustomAdapter(Context context, String[] Items) {
-        super(context,R.layout.custom_row, Items);
+     CustomAdapter(Context context, int resource, ArrayList<ItemClass> objects) {
+        super(context, resource, objects);
+         mContext = context;
+         mResource = resource;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        View customView = inflater.inflate(R.layout.custom_row, parent, false);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        convertView = inflater.inflate(mResource, parent, false);
 
-        String singleItem = getItem(position);
-        TextView tvItem = (TextView) customView.findViewById(R.id.tvItem);
-        ImageView ivPicture = (ImageView) customView.findViewById(R.id.ivPicture);
+        String itemname = getItem(position).getItem();
+        String description = getItem(position).getDescription();
+        double price = getItem(position).getPrice();
 
-        tvItem.setText(singleItem);
-        ivPicture.setImageResource(R.drawable.masina);
+        TextView tvItem = (TextView) convertView.findViewById(R.id.tvItem);
+        TextView tvDescription = (TextView) convertView.findViewById(R.id.tvDescription);
+        TextView tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
 
-        return customView;
+
+        tvItem.setText(itemname);
+        tvDescription.setText(description);
+        tvPrice.setText(price + "");
+   
+
+        return convertView;
     }
 
 
