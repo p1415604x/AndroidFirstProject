@@ -44,7 +44,7 @@ import java.util.ArrayList;
         tvItem.setText(itemname);
         tvDescription.setText(description);
         tvPrice.setText(price + "");
-   
+
 
         return convertView;
     }
