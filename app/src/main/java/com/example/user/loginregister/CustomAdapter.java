@@ -27,6 +27,7 @@ import java.util.ArrayList;
          mResource = resource;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
