@@ -48,8 +48,9 @@ bLogin.setOnClickListener(new View.OnClickListener() {
                 try {
                     JSONObject jsonresponse = new JSONObject(response);
                     boolean success = jsonresponse.getBoolean("success");
+                    String priv = jsonresponse.getString("privilege");
 
-                    if (success) {
+                    if ((success) && priv.equals("user")) {
                         String name = jsonresponse.getString("name");
                         int age = jsonresponse.getInt("age");
 
