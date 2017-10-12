@@ -60,6 +60,9 @@ bLogin.setOnClickListener(new View.OnClickListener() {
                         intent.putExtra("age", age);
 
                         LoginActivity.this.startActivity(intent);
+                    } else if ((success) && priv.equals("admin")) {
+                        Intent intent = new Intent(LoginActivity.this, Admin.class);
+                        LoginActivity.this.startActivity(intent);
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setMessage("Login Failed")
