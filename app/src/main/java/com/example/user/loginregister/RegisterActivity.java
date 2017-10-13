@@ -53,9 +53,6 @@ public class RegisterActivity extends AppCompatActivity {
                                         .create()
                                         .show();
                             }
-
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
