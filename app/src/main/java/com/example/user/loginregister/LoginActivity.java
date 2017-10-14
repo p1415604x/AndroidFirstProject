@@ -48,9 +48,13 @@ bLogin.setOnClickListener(new View.OnClickListener() {
                 try {
                     JSONObject jsonresponse = new JSONObject(response);
                     boolean success = jsonresponse.getBoolean("success");
-                    String priv = jsonresponse.getString("privilege");
 
-                    if ((success) && priv.equals("user")) {
+                    if (success) {
+                        String priv = jsonresponse.getString("privilege");
+                        if(priv.equals("admin")) {
+                            Intent intent = new Intent(LoginActivity.this, Admin.class);
+                            LoginActivity.this.startActivity(intent);
+                        } else {
                         String name = jsonresponse.getString("name");
                         int age = jsonresponse.getInt("age");
 
@@ -58,12 +62,8 @@ bLogin.setOnClickListener(new View.OnClickListener() {
                         intent.putExtra("name", name);
                         intent.putExtra("username", username);
                         intent.putExtra("age", age);
-
                         LoginActivity.this.startActivity(intent);
-                    } else if ((success) && priv.equals("admin")) {
-                        Intent intent = new Intent(LoginActivity.this, Admin.class);
-                        LoginActivity.this.startActivity(intent);
-                    } else {
+                    } }else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setMessage("Login Failed")
                                 .setNegativeButton("Retry", null)

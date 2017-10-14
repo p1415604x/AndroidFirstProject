@@ -31,7 +31,7 @@ public class Admin extends AppCompatActivity {
     private String TAG = ListViewActivity.class.getSimpleName(), REGISTER_REQUEST_URL;
     private ItemClass selectedItem;
     private ListView lv;
-    private ArrayList<ItemClass> contactList;
+    private ArrayList<ItemClass> productList;
     private Spinner spin;
     private Button bExecute;
 
@@ -41,7 +41,7 @@ public class Admin extends AppCompatActivity {
         setContentView(R.layout.activity_admin);
 
         //List View preparation and execution
-        contactList = new ArrayList<>();
+        productList = new ArrayList<>();
         lv = (ListView) findViewById(R.id.lvAdmin);
         //Listener for Selected Item
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -51,13 +51,13 @@ public class Admin extends AppCompatActivity {
             }
         });
         //Executing List Population
-        new Admin.GetContacts().execute();
+        new Admin.GetProducts().execute();
 
         //Spinner creation and collecion addition
         spin = (Spinner) findViewById(R.id.spinnerFunction);
-        List<String> spinitems = new ArrayList<String>();
+        List<String> spinitems = new ArrayList<>();
         Collections.addAll(spinitems, "Add Item", "Delete Item", "Edit Item");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(Admin.this, R.layout.support_simple_spinner_dropdown_item, spinitems);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(Admin.this, R.layout.support_simple_spinner_dropdown_item, spinitems);
         spin.setAdapter(adapter);
 
         //Button
@@ -78,7 +78,9 @@ public class Admin extends AppCompatActivity {
                             boolean success = jsonResponset.getBoolean("success");
                             if(success) {
                                 //REFRESH LIST
-                                new Admin.GetContacts().execute();
+                                Toast.makeText(getApplicationContext(), "Item Deleted", Toast.LENGTH_SHORT).show();
+                                productList.clear();
+                                new Admin.GetProducts().execute();
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(Admin.this);
                                 builder.setMessage("Execution Failed")
@@ -92,7 +94,6 @@ public class Admin extends AppCompatActivity {
                     }
                 };
 
-                Toast.makeText(getApplicationContext(),selectedItem.getItem(), Toast.LENGTH_LONG).show();
                 if(spin.getSelectedItemPosition()==0) {
                     REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/AddItem.php";
                 } else if (spin.getSelectedItemPosition()==1) {
@@ -111,12 +112,7 @@ public class Admin extends AppCompatActivity {
     }
 
 
-
-
-
-
-
-    private class GetContacts extends AsyncTask<Void, Void, Void> {
+    private class GetProducts extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
@@ -130,24 +126,24 @@ public class Admin extends AppCompatActivity {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
                     // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("server_response");
+                    JSONArray products = jsonObj.getJSONArray("server_response");
 
                     // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
+                    for (int i = 0; i < products.length(); i++) {
+                        JSONObject c = products.getJSONObject(i);
                         String item = c.getString("item");
                         String description = c.getString("description");
                         Double price = c.getDouble("price");
 
                         // tmp hash map for single contact
-                        ItemClass contact = new ItemClass();
+                        ItemClass product = new ItemClass();
 
                         // adding each child node to HashMap key => value
-                        contact.setItem(item);
-                        contact.setDescription(description);
-                        contact.setPrice(price);
+                        product.setItem(item);
+                        product.setDescription(description);
+                        product.setPrice(price);
                         // adding contact to contact list
-                        contactList.add(contact);
+                        productList.add(product);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -159,10 +155,7 @@ public class Admin extends AppCompatActivity {
                                     Toast.LENGTH_LONG).show();
                         }
                     });
-
-                }
-
-            } else {
+                } } else {
                 Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
                     @Override
@@ -173,14 +166,13 @@ public class Admin extends AppCompatActivity {
                     }
                 });
             }
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            CustomAdapter adapter = new CustomAdapter(Admin.this, R.layout.custom_row, contactList);
+            CustomAdapter adapter = new CustomAdapter(Admin.this, R.layout.custom_row, productList);
             lv.setAdapter(adapter);
         }
     }

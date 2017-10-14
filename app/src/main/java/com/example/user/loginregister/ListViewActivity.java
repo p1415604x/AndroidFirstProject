@@ -22,20 +22,20 @@ public class ListViewActivity extends AppCompatActivity {
 
     private String TAG = ListViewActivity.class.getSimpleName();
     private ListView lv;
-    ArrayList<ItemClass> contactList;
+    ArrayList<ItemClass> productList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_view);
 
-        contactList = new ArrayList<>();
+        productList = new ArrayList<>();
         lv = (ListView) findViewById(R.id.lvItems);
 
-        new GetContacts().execute();
+        new GetProducts().execute();
     }
 
-    private class GetContacts extends AsyncTask<Void, Void, Void> {
+    private class GetProducts extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -56,24 +56,24 @@ public class ListViewActivity extends AppCompatActivity {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
                     // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("server_response");
+                    JSONArray products = jsonObj.getJSONArray("server_response");
 
                     // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
+                    for (int i = 0; i < products.length(); i++) {
+                        JSONObject c = products.getJSONObject(i);
                         String item = c.getString("item");
                         String description = c.getString("description");
                         Double price = c.getDouble("price");
 
                         // tmp hash map for single contact
-                        ItemClass contact = new ItemClass();
+                        ItemClass product = new ItemClass();
 
                         // adding each child node to HashMap key => value
-                        contact.setItem(item);
-                        contact.setDescription(description);
-                        contact.setPrice(price);
+                        product.setItem(item);
+                        product.setDescription(description);
+                        product.setPrice(price);
                         // adding contact to contact list
-                        contactList.add(contact);
+                        productList.add(product);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -99,14 +99,13 @@ public class ListViewActivity extends AppCompatActivity {
                     }
                 });
             }
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            CustomAdapter adapter = new CustomAdapter(ListViewActivity.this, R.layout.custom_row, contactList);
+            CustomAdapter adapter = new CustomAdapter(ListViewActivity.this, R.layout.custom_row, productList);
             lv.setAdapter(adapter);
         }
     }

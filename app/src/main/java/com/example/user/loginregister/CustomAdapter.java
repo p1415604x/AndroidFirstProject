@@ -14,10 +14,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Created by User on 2017.10.08.
+ * Created by Laurynas Mykolaitis on 2017.10.08.
  */
 
- class CustomAdapter extends ArrayAdapter<ItemClass> {
+class CustomAdapter extends ArrayAdapter<ItemClass> {
     private Context mContext;
     private int mResource;
 
@@ -27,8 +27,7 @@ import java.util.ArrayList;
          mResource = resource;
     }
 
-
-    @Override
+    @Override @NonNull
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mResource, parent, false);
@@ -37,10 +36,9 @@ import java.util.ArrayList;
         String description = getItem(position).getDescription();
         double price = getItem(position).getPrice();
 
-        TextView tvItem = (TextView) convertView.findViewById(R.id.tvItem);
-        TextView tvDescription = (TextView) convertView.findViewById(R.id.tvDescription);
-        TextView tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
-
+        TextView tvItem = convertView.findViewById(R.id.tvItem);
+        TextView tvDescription = convertView.findViewById(R.id.tvDescription);
+        TextView tvPrice = convertView.findViewById(R.id.tvPrice);
 
         tvItem.setText(itemname);
         tvDescription.setText(description);
