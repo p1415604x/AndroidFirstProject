@@ -6,10 +6,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -34,24 +36,29 @@ public class Admin extends AppCompatActivity {
     private ArrayList<ItemClass> productList;
     private Spinner spin;
     private Button bExecute;
+    private EditText etProductName, etDescription, etPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        etProductName = (EditText) findViewById(R.id.etProductName);
+        etDescription = (EditText) findViewById(R.id.etDescription);
+        etPrice = (EditText) findViewById(R.id.etPrice);
+
         //List View preparation and execution
         productList = new ArrayList<>();
         lv = (ListView) findViewById(R.id.lvAdmin);
-        //Listener for Selected Item
+
+        //Listener to get information from selected item in list view
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                selectedItem = (ItemClass) lv.getItemAtPosition(position);
-            }
+                selectedItem = (ItemClass) lv.getItemAtPosition(position);   }
         });
-        //Executing List Population
-        new Admin.GetProducts().execute();
+        this.makeListViewScrollable();   //METHOD TO MAKE LV SCROLLABLE INSIDE SCROLLVIEW
+        new Admin.GetProducts().execute(); //Executing List Population
 
         //Spinner creation and collecion addition
         spin = (Spinner) findViewById(R.id.spinnerFunction);
@@ -59,15 +66,20 @@ public class Admin extends AppCompatActivity {
         Collections.addAll(spinitems, "Add Item", "Delete Item", "Edit Item");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(Admin.this, R.layout.support_simple_spinner_dropdown_item, spinitems);
         spin.setAdapter(adapter);
+        this.changeEditTextVisibility(); //spin SPINNER method
+
+
 
         //Button
         bExecute = (Button) findViewById(R.id.bExecute);
         bExecute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String itemName = selectedItem.getItem();
-                String itemDesc = selectedItem.getDescription();
-                Double itemPrice = selectedItem.getPrice();
+                int itemId = 0;
+                String itemName = "";
+                String itemDesc = "";
+                Double itemPrice = 0.0;
+                AdminRequest adminRequest;
 
                 Response.Listener<String> responseListener = new Response.Listener<String>(){
 
@@ -78,7 +90,7 @@ public class Admin extends AppCompatActivity {
                             boolean success = jsonResponset.getBoolean("success");
                             if(success) {
                                 //REFRESH LIST
-                                Toast.makeText(getApplicationContext(), "Item Deleted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "List Updated", Toast.LENGTH_SHORT).show();
                                 productList.clear();
                                 new Admin.GetProducts().execute();
                             } else {
@@ -94,23 +106,87 @@ public class Admin extends AppCompatActivity {
                     }
                 };
 
-                if(spin.getSelectedItemPosition()==0) {
+                if(spin.getSelectedItemPosition()==0) {                 //Statement to add item
                     REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/AddItem.php";
-                } else if (spin.getSelectedItemPosition()==1) {
+                    itemName = etProductName.getText().toString();
+                    itemDesc = etDescription.getText().toString();
+                    itemPrice = Double.parseDouble(etPrice.getText().toString());
+                    adminRequest = new AdminRequest(itemName, itemDesc, itemPrice,
+                            REGISTER_REQUEST_URL, responseListener);;
+                    etProductName.setText("");
+                    etDescription.setText("");
+                    etPrice.setText("");
+                } else if (spin.getSelectedItemPosition()==1) {         //Statement to delete item
                     REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/DeleteItem.php";
-                } else {
+                    itemId = selectedItem.getId();
+                    adminRequest = new AdminRequest(itemId, REGISTER_REQUEST_URL, responseListener);
+                } else {                                                //Statement to Edit item
                     REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/EditItem.php";
+                    // GET ADMIN WANTED VALUES
+                    itemName = etProductName.getText().toString();
+                    if(itemName.equals("")) {itemName = selectedItem.getItem();}
+                    itemDesc = etDescription.getText().toString();
+                    if(itemDesc.equals("")) {itemDesc = selectedItem.getDescription();}
+                    itemPrice = Double.parseDouble(etPrice.getText().toString());
+                    if(itemPrice.equals("")) {itemName = selectedItem.getPrice() + "";}
+                    //GET VALUES OF ITEM SELECTED (NEEDED TO IDENTIFY WHICH ITEM TO EDIT IN MYSQLI)
+                    itemId = selectedItem.getId();
+                    adminRequest = new AdminRequest(itemId, itemName, itemDesc, itemPrice,
+                            REGISTER_REQUEST_URL, responseListener);
                 }
-                AdminRequest adminRequest = new AdminRequest(itemName, itemDesc, itemPrice, REGISTER_REQUEST_URL, responseListener);
+                //Add request to queue
                 RequestQueue queue = Volley.newRequestQueue(Admin.this);
                 queue.add(adminRequest);
-
 
 
             }
         });
     }
 
+    private void makeListViewScrollable() {
+        lv.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+    }
+
+    private void changeEditTextVisibility() { //HIDES EDITTEXTs IF NOT NEEDED
+        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if (spin.getSelectedItemPosition() == 1) {
+                    etProductName.setVisibility(View.GONE);
+                    etDescription.setVisibility(View.GONE);
+                    etPrice.setVisibility(View.GONE);
+                } else {
+                    etProductName.setVisibility(View.VISIBLE);
+                    etDescription.setVisibility(View.VISIBLE);
+                    etPrice.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                etProductName.setVisibility(View.GONE);
+                etDescription.setVisibility(View.GONE);
+                etPrice.setVisibility(View.GONE);
+            }
+        });
+    }
 
     private class GetProducts extends AsyncTask<Void, Void, Void> {
         @Override
@@ -131,6 +207,7 @@ public class Admin extends AppCompatActivity {
                     // looping through All Contacts
                     for (int i = 0; i < products.length(); i++) {
                         JSONObject c = products.getJSONObject(i);
+                        int id = c.getInt("id");
                         String item = c.getString("item");
                         String description = c.getString("description");
                         Double price = c.getDouble("price");
@@ -139,6 +216,7 @@ public class Admin extends AppCompatActivity {
                         ItemClass product = new ItemClass();
 
                         // adding each child node to HashMap key => value
+                        product.setId(id);
                         product.setItem(item);
                         product.setDescription(description);
                         product.setPrice(price);

@@ -5,17 +5,20 @@ package com.example.user.loginregister;
  */
 
 public class ItemClass {
+    private int id;
     private String item;
     private String description;
     private double price;
 
     public ItemClass() {
+        id = 0;
         item = "";
         this.description = "";
         price = 0.0;
     }
 
-    public ItemClass(String item, String description, double price) {
+    public ItemClass(int id, String item, String description, double price) {
+        this.id = id;
         this.item = item;
         this.description = description;
         this.price = price;
@@ -37,13 +40,15 @@ public class ItemClass {
         this.description = description;
     }
 
-    public double getPrice() {
-        return price;
-    }
+    public double getPrice() { return price; }
 
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 }
 
 
