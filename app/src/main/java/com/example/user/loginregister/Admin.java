@@ -30,13 +30,18 @@ import java.util.List;
 
 public class Admin extends AppCompatActivity {
 
-    private String TAG = ListViewActivity.class.getSimpleName(), REGISTER_REQUEST_URL;
+    private String TAG = ListViewActivity.class.getSimpleName(), ADMIN_REQUEST_URL;
     private ItemClass selectedItem;
     private ListView lv;
     private ArrayList<ItemClass> productList;
     private Spinner spin;
     private Button bExecute;
     private EditText etProductName, etDescription, etPrice;
+    private String itemName, itemDesc;
+    private Double itemPrice;
+    private   AdminRequest adminRequest;
+    private Response.Listener<String> responseListener;
+    private int itemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +81,10 @@ public class Admin extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int itemId = 0;
-                String itemName = "";
-                String itemDesc = "";
-                Double itemPrice = 0.0;
-                AdminRequest adminRequest;
 
-                Response.Listener<String> responseListener = new Response.Listener<String>(){
+
+
+                responseListener = new Response.Listener<String>(){
 
                     @Override
                     public void onResponse(String response) {
@@ -107,40 +110,81 @@ public class Admin extends AppCompatActivity {
                 };
 
                 if(spin.getSelectedItemPosition()==0) {                 //Statement to add item
-                    REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/AddItem.php";
-                    itemName = etProductName.getText().toString();
-                    itemDesc = etDescription.getText().toString();
-                    itemPrice = Double.parseDouble(etPrice.getText().toString());
-                    adminRequest = new AdminRequest(itemName, itemDesc, itemPrice,
-                            REGISTER_REQUEST_URL, responseListener);;
-                    etProductName.setText("");
-                    etDescription.setText("");
-                    etPrice.setText("");
+                    if(etProductName.getText().toString().equals("") || etDescription.getText().toString().equals("")
+                            || etPrice.getText().toString().equals("")) {
+                        errorMessage("Check if all fields have values!");
+                    } else {
+                        addItemRequest();
+                        clearEditTexts();
+                        addRequestToTheQueue();
+                    }
                 } else if (spin.getSelectedItemPosition()==1) {         //Statement to delete item
-                    REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/DeleteItem.php";
-                    itemId = selectedItem.getId();
-                    adminRequest = new AdminRequest(itemId, REGISTER_REQUEST_URL, responseListener);
+                    if(selectedItem !=null) {
+                        ADMIN_REQUEST_URL = "https://darkgienius.000webhostapp.com/DeleteItem.php";
+                        itemId = selectedItem.getId();
+                        adminRequest = new AdminRequest(itemId, ADMIN_REQUEST_URL, responseListener);
+                        addRequestToTheQueue();
+                    } else {
+                        errorMessage("Select item to delete!");
+                    }
                 } else {                                                //Statement to Edit item
-                    REGISTER_REQUEST_URL = "https://darkgienius.000webhostapp.com/EditItem.php";
-                    // GET ADMIN WANTED VALUES
-                    itemName = etProductName.getText().toString();
-                    if(itemName.equals("")) {itemName = selectedItem.getItem();}
-                    itemDesc = etDescription.getText().toString();
-                    if(itemDesc.equals("")) {itemDesc = selectedItem.getDescription();}
-                    itemPrice = Double.parseDouble(etPrice.getText().toString());
-                    if(itemPrice.equals("")) {itemName = selectedItem.getPrice() + "";}
-                    //GET VALUES OF ITEM SELECTED (NEEDED TO IDENTIFY WHICH ITEM TO EDIT IN MYSQLI)
-                    itemId = selectedItem.getId();
-                    adminRequest = new AdminRequest(itemId, itemName, itemDesc, itemPrice,
-                            REGISTER_REQUEST_URL, responseListener);
+                   if(selectedItem !=null) {
+                       if (!etProductName.getText().toString().equals("") || !etDescription.getText().toString().equals("")
+                               || !etPrice.getText().toString().equals("")) {
+                           editItemRequest();
+                           clearEditTexts();
+                           addRequestToTheQueue();
+                       } else {
+                           errorMessage("At least one field has to have value!");
+                       }
+                   } else { errorMessage("Select item to edit!");}
                 }
-                //Add request to queue
-                RequestQueue queue = Volley.newRequestQueue(Admin.this);
-                queue.add(adminRequest);
-
 
             }
         });
+    }
+
+    private void clearEditTexts() {
+        etProductName.setText("");
+        etDescription.setText("");
+        etPrice.setText("");
+    }
+
+    private void errorMessage(String s) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Admin.this);
+        builder.setMessage(s)
+                .setNegativeButton("Retry", null)
+                .create()
+                .show();
+    }
+
+    private void addRequestToTheQueue() {
+        RequestQueue queue = Volley.newRequestQueue(Admin.this);
+        queue.add(adminRequest);
+    }
+
+    private void addItemRequest() {
+        ADMIN_REQUEST_URL = "https://darkgienius.000webhostapp.com/AddItem.php";
+        itemName = etProductName.getText().toString();
+        itemDesc = etDescription.getText().toString();
+        itemPrice = Double.parseDouble(etPrice.getText().toString());
+        adminRequest = new AdminRequest(itemName, itemDesc, itemPrice,
+                ADMIN_REQUEST_URL, responseListener);;
+    }
+
+    private void editItemRequest() {
+        ADMIN_REQUEST_URL = "https://darkgienius.000webhostapp.com/EditItem.php";
+        // GET ADMIN WANTED VALUES
+        if(etProductName.getText().toString().equals("")) {itemName = selectedItem.getItem();}
+        else{itemName = etProductName.getText().toString();}
+        if(etDescription.getText().toString().equals("")) {itemDesc = selectedItem.getDescription();}
+        else{itemDesc = etDescription.getText().toString();}
+        if(etPrice.getText().toString().equals("")) {itemPrice = selectedItem.getPrice();}
+        else{itemPrice = Double.parseDouble(etPrice.getText().toString());}
+        //GET VALUES OF ITEM SELECTED (NEEDED TO IDENTIFY WHICH ITEM TO EDIT IN MYSQLI)
+        itemId = selectedItem.getId();
+        adminRequest = new AdminRequest(itemId, itemName, itemDesc, itemPrice,
+                ADMIN_REQUEST_URL, responseListener);
     }
 
     private void makeListViewScrollable() {

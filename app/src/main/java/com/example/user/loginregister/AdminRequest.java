@@ -19,22 +19,22 @@ import java.util.Map;
 public class AdminRequest extends StringRequest {
 
     private Map<String, String> params;
-    public AdminRequest(int itemId, String REGISTER_REQUEST_URL, Response.Listener<String> listener) {
-        super(Method.POST, REGISTER_REQUEST_URL, listener, null);
+    public AdminRequest(int itemId, String ADMIN_REQUEST_URL, Response.Listener<String> listener) {
+        super(Method.POST, ADMIN_REQUEST_URL, listener, null);
         params = new HashMap<>();
         params.put("id", itemId + "");
     }
 
-    public AdminRequest(String itemName, String itemDesc, Double itemPrice, String REGISTER_REQUEST_URL, Response.Listener<String> listener) {
-        super(Method.POST, REGISTER_REQUEST_URL, listener, null);
+    public AdminRequest(String itemName, String itemDesc, Double itemPrice, String ADMIN_REQUEST_URL, Response.Listener<String> listener) {
+        super(Method.POST, ADMIN_REQUEST_URL, listener, null);
         params = new HashMap<>();
         params.put("item", itemName);
         params.put("description", itemDesc);
         params.put("price", itemPrice + "");
     }
 
-    public AdminRequest(int itemId, String itemName, String itemDesc, Double itemPrice, String REGISTER_REQUEST_URL, Response.Listener<String> listener) {
-        super(Method.POST, REGISTER_REQUEST_URL, listener, null);
+    public AdminRequest(int itemId, String itemName, String itemDesc, Double itemPrice, String ADMIN_REQUEST_URL, Response.Listener<String> listener) {
+        super(Method.POST, ADMIN_REQUEST_URL, listener, null);
         params = new HashMap<>();
         params.put("id", itemId + "");
         params.put("item", itemName);
