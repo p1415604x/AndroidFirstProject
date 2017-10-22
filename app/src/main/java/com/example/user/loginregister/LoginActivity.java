@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,8 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
 
     @Override
@@ -27,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
         final Button bLogin = (Button) findViewById(R.id.bLogin);
         final TextView registerLink = (TextView) findViewById(R.id.tvRegisterhere);
+
 
         registerLink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,12 +60,9 @@ bLogin.setOnClickListener(new View.OnClickListener() {
                             LoginActivity.this.startActivity(intent);
                         } else {
                         String name = jsonresponse.getString("name");
-                        int age = jsonresponse.getInt("age");
 
                         Intent intent = new Intent(LoginActivity.this, UserAreaActivity.class);
                         intent.putExtra("name", name);
-                        intent.putExtra("username", username);
-                        intent.putExtra("age", age);
                         LoginActivity.this.startActivity(intent);
                     } }else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);

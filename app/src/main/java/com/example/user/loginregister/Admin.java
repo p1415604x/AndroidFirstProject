@@ -1,6 +1,5 @@
 package com.example.user.loginregister;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +38,7 @@ public class Admin extends AppCompatActivity {
     private EditText etProductName, etDescription, etPrice;
     private String itemName, itemDesc;
     private Double itemPrice;
-    private   AdminRequest adminRequest;
+    private AdminRequest adminRequest;
     private Response.Listener<String> responseListener;
     private int itemId;
 
@@ -73,17 +72,11 @@ public class Admin extends AppCompatActivity {
         spin.setAdapter(adapter);
         this.changeEditTextVisibility(); //spin SPINNER method
 
-
-
         //Button
         bExecute = (Button) findViewById(R.id.bExecute);
         bExecute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int itemId = 0;
-
-
-
                 responseListener = new Response.Listener<String>(){
 
                     @Override
@@ -169,7 +162,7 @@ public class Admin extends AppCompatActivity {
         itemDesc = etDescription.getText().toString();
         itemPrice = Double.parseDouble(etPrice.getText().toString());
         adminRequest = new AdminRequest(itemName, itemDesc, itemPrice,
-                ADMIN_REQUEST_URL, responseListener);;
+                ADMIN_REQUEST_URL, responseListener);
     }
 
     private void editItemRequest() {

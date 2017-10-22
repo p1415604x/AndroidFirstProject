@@ -17,6 +17,12 @@ public class ItemClass {
         price = 0.0;
     }
 
+    public ItemClass(String item, String description, double price) {
+        this.item = item;
+        this.description = description;
+        this.price = price;
+    }
+
     public ItemClass(int id, String item, String description, double price) {
         this.id = id;
         this.item = item;
@@ -49,6 +55,11 @@ public class ItemClass {
     public int getId() { return id; }
 
     public void setId(int id) { this.id = id; }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + " ITEM: " + item + " DESCRIPTION: " + description + " PRICE: " + price;
+    }
 }
 
 

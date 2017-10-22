@@ -20,11 +20,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".UserAreaActivity" android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".ListViewActivity" android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".Admin" android:windowSoftInputMode="stateHidden"  >
-        </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".UserAreaActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ListViewActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Admin"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".ContactActivity" />
     </application>
 
 </manifest>

@@ -1,10 +1,14 @@
 package com.example.user.loginregister;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,31 +20,35 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class ListViewActivity extends AppCompatActivity {
 
+
     private String TAG = ListViewActivity.class.getSimpleName();
     private ListView lv;
     ArrayList<ItemClass> productList;
+    DBHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_view);
+        db = new DBHandler(this);
+
 
         productList = new ArrayList<>();
         lv = (ListView) findViewById(R.id.lvItems);
 
         new GetProducts().execute();
+
     }
 
     private class GetProducts extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(ListViewActivity.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
-
         }
 
         @Override
@@ -54,6 +62,7 @@ public class ListViewActivity extends AppCompatActivity {
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
+                        db.deleteAllItems();
 
                     // Getting JSON Array node
                     JSONArray products = jsonObj.getJSONArray("server_response");
@@ -74,6 +83,7 @@ public class ListViewActivity extends AppCompatActivity {
                         product.setPrice(price);
                         // adding contact to contact list
                         productList.add(product);
+                        db.addItem(product);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -94,8 +104,9 @@ public class ListViewActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "Server is down, some information might be outdated!",
                                 Toast.LENGTH_LONG).show();
+                        productList.addAll(db.getAllItems());
                     }
                 });
             }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LoginRegister</string>
+    <string name="app_name">Fresh Products</string>
     <string name="admin_panel">Admin Panel</string>
     <string name="product_name">Product Name</string>
     <string name="product_description">Product Description</string>
